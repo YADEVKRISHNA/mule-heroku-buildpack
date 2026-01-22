@@ -59,10 +59,10 @@ download_mule() {
   local muleUrl=$1
   local installDir=$2
   local muleHome=$3
-  local username=$4
-  local password=$5
+  local nexus_username=$4
+  local nexus_password=$5
 
-  curl --fail --retry 3 --retry-connrefused --connect-timeout 5 --silent --max-time 60 -u "${username}:${password}" --location "${muleUrl}" | tar xzm -C $installDir
+  curl --fail --retry 3 --retry-connrefused --connect-timeout 5 --silent --max-time 60 -u "${nexus_username}:${nexus_password}" --location "${muleUrl}" | tar xzm -C $installDir
 
 }
 
@@ -71,7 +71,7 @@ is_supported_mule_version() {
   local muleUrl=${2:?}
   if [ "$muleVersion" = "$DEFAULT_MAVEN_VERSION" ]; then
     return 0
-  elif curl -I --retry 3 --retry-connrefused --connect-timeout 5 --fail --silent --max-time 5 -u "${username}:${password}" --location "${muleUrl}" > /dev/null; then
+  elif curl -I --retry 3 --retry-connrefused --connect-timeout 5 --fail --silent --max-time 5 -u "${nexus_username}:${nexus_password}" --location "${muleUrl}" > /dev/null; then
     return 0
   else
     return 1
