@@ -40,7 +40,8 @@ install_mule() {
   mcount "mule.version.${muleVersion}"
 
   status_pending "Installing Mule ${muleVersion}"
-  local muleUrl="https://s3.amazonaws.com/new-mule-artifacts/mule-ee-distribution-standalone-${muleVersion}.tar.gz"
+  #local muleUrl="https://s3.amazonaws.com/new-mule-artifacts/mule-ee-distribution-standalone-${muleVersion}.tar.gz"
+  local muleUrl="https://repository.mulesoft.org/nexus/repository/ci-releases/com/mulesoft/mule/distributions/mule-ee-distribution-standalone/${muleVersion}/mule-ee-distribution-standalone-${muleVersion}.zip"
   
   if is_supported_mule_version "${muleVersion}" "${muleUrl}"; then
     download_mule "${muleUrl}" "${buildDir}" "${muleHome}"
@@ -58,8 +59,10 @@ download_mule() {
   local muleUrl=$1
   local installDir=$2
   local muleHome=$3
+  local username=$4
+  local password=$5
 
-  curl --fail --retry 3 --retry-connrefused --connect-timeout 5 --silent --max-time 60 --location "${muleUrl}" | tar xzm -C $installDir
+  curl --fail --retry 3 --retry-connrefused --connect-timeout 5 --silent --max-time 60 -u "${username}:${password}" --location "${muleUrl}" | tar xzm -C $installDir
 
 }
 
@@ -68,7 +71,7 @@ is_supported_mule_version() {
   local muleUrl=${2:?}
   if [ "$muleVersion" = "$DEFAULT_MAVEN_VERSION" ]; then
     return 0
-  elif curl -I --retry 3 --retry-connrefused --connect-timeout 5 --fail --silent --max-time 5 --location "${muleUrl}" > /dev/null; then
+  elif curl -I --retry 3 --retry-connrefused --connect-timeout 5 --fail --silent --max-time 5 -u "${username}:${password}" --location "${muleUrl}" > /dev/null; then
     return 0
   else
     return 1
